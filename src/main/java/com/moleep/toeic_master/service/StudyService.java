@@ -1,0 +1,102 @@
+package com.moleep.toeic_master.service;
+
+import com.moleep.toeic_master.dto.request.StudyRequest;
+import com.moleep.toeic_master.dto.response.StudyResponse;
+import com.moleep.toeic_master.entity.ExamType;
+import com.moleep.toeic_master.entity.Study;
+import com.moleep.toeic_master.entity.StudyStatus;
+import com.moleep.toeic_master.entity.User;
+import com.moleep.toeic_master.exception.CustomException;
+import com.moleep.toeic_master.repository.StudyRepository;
+import com.moleep.toeic_master.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+public class StudyService {
+
+    private final StudyRepository studyRepository;
+    private final UserRepository userRepository;
+
+    @Transactional(readOnly = true)
+    public Page<StudyResponse> getStudies(String keyword, ExamType examType, String region,
+                                          Integer minScore, Integer maxScore, Pageable pageable) {
+        return studyRepository.findWithFilters(keyword, examType, region, StudyStatus.RECRUITING, minScore, maxScore, pageable)
+                .map(StudyResponse::from);
+    }
+
+    @Transactional(readOnly = true)
+    public StudyResponse getStudy(Long id) {
+        Study study = studyRepository.findById(id)
+                .orElseThrow(() -> new CustomException("스터디를 찾을 수 없습니다", HttpStatus.NOT_FOUND));
+        return StudyResponse.from(study);
+    }
+
+    @Transactional
+    public StudyResponse createStudy(Long userId, StudyRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException("사용자를 찾을 수 없습니다", HttpStatus.NOT_FOUND));
+
+        Study study = Study.builder()
+                .user(user)
+                .title(request.getTitle())
+                .content(request.getContent())
+                .examType(request.getExamType())
+                .region(request.getRegion())
+                .targetScore(request.getTargetScore())
+                .maxMembers(request.getMaxMembers())
+                .build();
+
+        studyRepository.save(study);
+        return StudyResponse.from(study);
+    }
+
+    @Transactional
+    public StudyResponse updateStudy(Long userId, Long studyId, StudyRequest request) {
+        Study study = studyRepository.findById(studyId)
+                .orElseThrow(() -> new CustomException("스터디를 찾을 수 없습니다", HttpStatus.NOT_FOUND));
+
+        if (!study.getUser().getId().equals(userId)) {
+            throw new CustomException("수정 권한이 없습니다", HttpStatus.FORBIDDEN);
+        }
+
+        study.setTitle(request.getTitle());
+        study.setContent(request.getContent());
+        study.setExamType(request.getExamType());
+        study.setRegion(request.getRegion());
+        study.setTargetScore(request.getTargetScore());
+        study.setMaxMembers(request.getMaxMembers());
+
+        return StudyResponse.from(study);
+    }
+
+    @Transactional
+    public void deleteStudy(Long userId, Long studyId) {
+        Study study = studyRepository.findById(studyId)
+                .orElseThrow(() -> new CustomException("스터디를 찾을 수 없습니다", HttpStatus.NOT_FOUND));
+
+        if (!study.getUser().getId().equals(userId)) {
+            throw new CustomException("삭제 권한이 없습니다", HttpStatus.FORBIDDEN);
+        }
+
+        studyRepository.delete(study);
+    }
+
+    @Transactional
+    public StudyResponse closeStudy(Long userId, Long studyId) {
+        Study study = studyRepository.findById(studyId)
+                .orElseThrow(() -> new CustomException("스터디를 찾을 수 없습니다", HttpStatus.NOT_FOUND));
+
+        if (!study.getUser().getId().equals(userId)) {
+            throw new CustomException("마감 권한이 없습니다", HttpStatus.FORBIDDEN);
+        }
+
+        study.setStatus(StudyStatus.CLOSED);
+        return StudyResponse.from(study);
+    }
+}
