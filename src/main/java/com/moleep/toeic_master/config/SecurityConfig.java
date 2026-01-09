@@ -31,10 +31,13 @@ public class SecurityConfig {
                         // Public endpoints
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/api-docs/**", "/swagger-ui.html").permitAll()
+                        // WebSocket
+                        .requestMatchers("/ws/**").permitAll()
                         // Read operations are public
                         .requestMatchers(HttpMethod.GET, "/api/studies/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/schools/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/tags/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/users/{id}").permitAll()
                         // Write operations require authentication
                         .anyRequest().authenticated()
                 )

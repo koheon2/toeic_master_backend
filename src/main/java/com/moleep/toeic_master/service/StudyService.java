@@ -2,10 +2,8 @@ package com.moleep.toeic_master.service;
 
 import com.moleep.toeic_master.dto.request.StudyRequest;
 import com.moleep.toeic_master.dto.response.StudyResponse;
-import com.moleep.toeic_master.entity.ExamType;
-import com.moleep.toeic_master.entity.Study;
-import com.moleep.toeic_master.entity.StudyStatus;
-import com.moleep.toeic_master.entity.User;
+import com.moleep.toeic_master.entity.*;
+import com.moleep.toeic_master.repository.StudyMemberRepository;
 import com.moleep.toeic_master.exception.CustomException;
 import com.moleep.toeic_master.repository.StudyRepository;
 import com.moleep.toeic_master.repository.UserRepository;
@@ -22,6 +20,7 @@ public class StudyService {
 
     private final StudyRepository studyRepository;
     private final UserRepository userRepository;
+    private final StudyMemberRepository studyMemberRepository;
 
     @Transactional(readOnly = true)
     public Page<StudyResponse> getStudies(String keyword, ExamType examType, String region,
@@ -53,6 +52,15 @@ public class StudyService {
                 .build();
 
         studyRepository.save(study);
+
+        // 방장을 멤버로 추가
+        StudyMember leader = StudyMember.builder()
+                .study(study)
+                .user(user)
+                .role(MemberRole.LEADER)
+                .build();
+        studyMemberRepository.save(leader);
+
         return StudyResponse.from(study);
     }
 

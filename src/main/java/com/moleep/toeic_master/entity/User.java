@@ -28,6 +28,9 @@ public class User {
     @Column(nullable = false, length = 50)
     private String nickname;
 
+    @Column(columnDefinition = "TEXT")
+    private String bio;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
