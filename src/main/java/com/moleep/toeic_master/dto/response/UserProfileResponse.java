@@ -15,14 +15,16 @@ public class UserProfileResponse {
     private String email;
     private String nickname;
     private String bio;
+    private String profileImageUrl;
     private LocalDateTime createdAt;
 
-    public static UserProfileResponse from(User user) {
+    public static UserProfileResponse from(User user, String profileImageUrl) {
         return UserProfileResponse.builder()
                 .id(user.getId())
                 .email(user.getEmail())
                 .nickname(user.getNickname())
                 .bio(user.getBio())
+                .profileImageUrl(profileImageUrl)
                 .createdAt(user.getCreatedAt())
                 .build();
     }

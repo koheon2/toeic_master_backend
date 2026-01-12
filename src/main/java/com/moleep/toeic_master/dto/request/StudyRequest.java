@@ -1,6 +1,5 @@
 package com.moleep.toeic_master.dto.request;
 
-import com.moleep.toeic_master.entity.ExamType;
 import com.moleep.toeic_master.entity.StudyType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -17,8 +16,8 @@ public class StudyRequest {
 
     private String content;
 
-    @NotNull(message = "시험 종류는 필수입니다")
-    private ExamType examType;
+    @NotBlank(message = "시험 종류는 필수입니다")
+    private String examType;
 
     @NotBlank(message = "지역은 필수입니다")
     private String region;

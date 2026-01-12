@@ -1,6 +1,5 @@
 package com.moleep.toeic_master.dto.response;
 
-import com.moleep.toeic_master.entity.ExamType;
 import com.moleep.toeic_master.entity.Study;
 import com.moleep.toeic_master.entity.StudyStatus;
 import com.moleep.toeic_master.entity.StudyType;
@@ -16,10 +15,11 @@ public class StudyResponse {
     private Long id;
     private String title;
     private String content;
-    private ExamType examType;
+    private String examType;
     private String region;
     private Integer targetScore;
     private Integer maxMembers;
+    private Integer currentMembers;
     private StudyType studyType;
     private String meetingFrequency;
     private StudyStatus status;
@@ -27,7 +27,7 @@ public class StudyResponse {
     private Long authorId;
     private String authorNickname;
 
-    public static StudyResponse from(Study study) {
+    public static StudyResponse from(Study study, int currentMembers) {
         return StudyResponse.builder()
                 .id(study.getId())
                 .title(study.getTitle())
@@ -36,6 +36,7 @@ public class StudyResponse {
                 .region(study.getRegion())
                 .targetScore(study.getTargetScore())
                 .maxMembers(study.getMaxMembers())
+                .currentMembers(currentMembers)
                 .studyType(study.getStudyType())
                 .meetingFrequency(study.getMeetingFrequency())
                 .status(study.getStatus())

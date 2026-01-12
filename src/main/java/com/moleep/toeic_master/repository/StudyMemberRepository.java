@@ -16,4 +16,5 @@ public interface StudyMemberRepository extends JpaRepository<StudyMember, Long> 
     Optional<StudyMember> findByStudyIdAndRole(Long studyId, MemberRole role);
     boolean existsByStudyIdAndUserId(Long studyId, Long userId);
     void deleteByStudyIdAndUserId(Long studyId, Long userId);
+    int countByStudyId(Long studyId);
 }

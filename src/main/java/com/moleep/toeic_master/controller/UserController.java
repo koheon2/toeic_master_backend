@@ -20,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/users")
@@ -44,6 +45,23 @@ public class UserController {
             @Valid @RequestBody ProfileUpdateRequest request) {
         UserProfileResponse profile = userService.updateProfile(userDetails.getId(), request);
         return ResponseEntity.ok(ApiResponse.success("프로필이 수정되었습니다", profile));
+    }
+
+    @PostMapping(value = "/me/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "프로필 이미지 업로드", description = "프로필 이미지를 업로드합니다")
+    public ResponseEntity<ApiResponse<UserProfileResponse>> uploadProfileImage(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam("image") MultipartFile image) {
+        UserProfileResponse profile = userService.updateProfileImage(userDetails.getId(), image);
+        return ResponseEntity.ok(ApiResponse.success("프로필 이미지가 업로드되었습니다", profile));
+    }
+
+    @DeleteMapping(value = "/me/profile-image", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "프로필 이미지 삭제", description = "프로필 이미지를 삭제합니다")
+    public ResponseEntity<ApiResponse<UserProfileResponse>> deleteProfileImage(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        UserProfileResponse profile = userService.deleteProfileImage(userDetails.getId());
+        return ResponseEntity.ok(ApiResponse.success("프로필 이미지가 삭제되었습니다", profile));
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

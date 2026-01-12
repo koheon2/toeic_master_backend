@@ -3,12 +3,12 @@ spring:
     name: toeic_master
 
   datasource:
-    url: jdbc:postgresql://toeic-master-db.cnio2wekq32n.ap-northeast-2.rds.amazonaws.com:5432/postgres
+    url: jdbc:postgresql://toeic-master-db.cnio2wekq32n.ap-northeast-2.rds.amazonaws.com:5432/toeic_master
     username: toeic_master
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 5       # 기본 10 → 5
+      maximum-pool-size: 10
       minimum-idle: 2
       idle-timeout: 30000
       connection-timeout: 10000
@@ -35,7 +35,7 @@ server:
   port: 8080
   tomcat:
     threads:
-      max: 50        # 기본 200 → 50으로 줄임
+      max: 200
       min-spare: 5
     max-connections: 200
     accept-count: 50

@@ -27,9 +27,8 @@ public class Study {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "exam_type", nullable = false, length = 50)
-    private ExamType examType;
+    private String examType;
 
     @Column(nullable = false, length = 100)
     private String region;

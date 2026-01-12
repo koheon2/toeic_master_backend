@@ -23,17 +23,17 @@ public class StudyService {
     private final StudyMemberRepository studyMemberRepository;
 
     @Transactional(readOnly = true)
-    public Page<StudyResponse> getStudies(String keyword, ExamType examType, String region,
+    public Page<StudyResponse> getStudies(String keyword, String examType, String region,
                                           Integer minScore, Integer maxScore, Pageable pageable) {
         return studyRepository.findWithFilters(keyword, examType, region, StudyStatus.RECRUITING, minScore, maxScore, pageable)
-                .map(StudyResponse::from);
+                .map(study -> StudyResponse.from(study, studyMemberRepository.countByStudyId(study.getId())));
     }
 
     @Transactional(readOnly = true)
     public StudyResponse getStudy(Long id) {
         Study study = studyRepository.findById(id)
                 .orElseThrow(() -> new CustomException("스터디를 찾을 수 없습니다", HttpStatus.NOT_FOUND));
-        return StudyResponse.from(study);
+        return StudyResponse.from(study, studyMemberRepository.countByStudyId(study.getId()));
     }
 
     @Transactional
@@ -63,7 +63,7 @@ public class StudyService {
                 .build();
         studyMemberRepository.save(leader);
 
-        return StudyResponse.from(study);
+        return StudyResponse.from(study, 1);
     }
 
     @Transactional
@@ -84,7 +84,7 @@ public class StudyService {
         study.setStudyType(request.getStudyType());
         study.setMeetingFrequency(request.getMeetingFrequency());
 
-        return StudyResponse.from(study);
+        return StudyResponse.from(study, studyMemberRepository.countByStudyId(study.getId()));
     }
 
     @Transactional
@@ -109,6 +109,6 @@ public class StudyService {
         }
 
         study.setStatus(StudyStatus.CLOSED);
-        return StudyResponse.from(study);
+        return StudyResponse.from(study, studyMemberRepository.countByStudyId(study.getId()));
     }
 }

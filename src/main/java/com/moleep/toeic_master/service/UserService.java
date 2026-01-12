@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -31,14 +32,18 @@ public class UserService {
     public UserProfileResponse getMyProfile(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException("사용자를 찾을 수 없습니다", HttpStatus.NOT_FOUND));
-        return UserProfileResponse.from(user);
+        return UserProfileResponse.from(user, getProfileImageUrl(user));
     }
 
     @Transactional(readOnly = true)
     public UserProfileResponse getUserProfile(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException("사용자를 찾을 수 없습니다", HttpStatus.NOT_FOUND));
-        return UserProfileResponse.from(user);
+        return UserProfileResponse.from(user, getProfileImageUrl(user));
+    }
+
+    private String getProfileImageUrl(User user) {
+        return user.getProfileImageKey() != null ? s3Service.getPresignedUrl(user.getProfileImageKey()) : null;
     }
 
     @Transactional
@@ -57,7 +62,37 @@ public class UserService {
             user.setBio(request.getBio());
         }
 
-        return UserProfileResponse.from(user);
+        return UserProfileResponse.from(user, getProfileImageUrl(user));
+    }
+
+    @Transactional
+    public UserProfileResponse updateProfileImage(Long userId, MultipartFile image) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException("사용자를 찾을 수 없습니다", HttpStatus.NOT_FOUND));
+
+        // 기존 이미지 삭제
+        if (user.getProfileImageKey() != null) {
+            s3Service.delete(user.getProfileImageKey());
+        }
+
+        // 새 이미지 업로드
+        String imageKey = s3Service.upload(image, "profile-images");
+        user.setProfileImageKey(imageKey);
+
+        return UserProfileResponse.from(user, s3Service.getPresignedUrl(imageKey));
+    }
+
+    @Transactional
+    public UserProfileResponse deleteProfileImage(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException("사용자를 찾을 수 없습니다", HttpStatus.NOT_FOUND));
+
+        if (user.getProfileImageKey() != null) {
+            s3Service.delete(user.getProfileImageKey());
+            user.setProfileImageKey(null);
+        }
+
+        return UserProfileResponse.from(user, null);
     }
 
     @Transactional(readOnly = true)
@@ -85,7 +120,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public java.util.List<StudyResponse> getMyStudies(Long userId) {
         return studyMemberRepository.findByUserId(userId).stream()
-                .map(member -> StudyResponse.from(member.getStudy()))
+                .map(member -> StudyResponse.from(member.getStudy(), studyMemberRepository.countByStudyId(member.getStudy().getId())))
                 .toList();
     }
 }

@@ -1,6 +1,5 @@
 package com.moleep.toeic_master.repository;
 
-import com.moleep.toeic_master.entity.ExamType;
 import com.moleep.toeic_master.entity.Study;
 import com.moleep.toeic_master.entity.StudyStatus;
 import org.springframework.data.domain.Page;
@@ -23,7 +22,7 @@ public interface StudyRepository extends JpaRepository<Study, Long> {
             "ORDER BY s.createdAt DESC")
     Page<Study> findWithFilters(
             @Param("keyword") String keyword,
-            @Param("examType") ExamType examType,
+            @Param("examType") String examType,
             @Param("region") String region,
             @Param("status") StudyStatus status,
             @Param("minScore") Integer minScore,

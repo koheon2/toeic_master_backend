@@ -3,7 +3,6 @@ package com.moleep.toeic_master.controller;
 import com.moleep.toeic_master.dto.request.StudyRequest;
 import com.moleep.toeic_master.dto.response.ApiResponse;
 import com.moleep.toeic_master.dto.response.StudyResponse;
-import com.moleep.toeic_master.entity.ExamType;
 import com.moleep.toeic_master.security.CustomUserDetails;
 import com.moleep.toeic_master.service.StudyService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,7 +32,7 @@ public class StudyController {
     @Operation(summary = "스터디 목록 조회", description = "검색 및 필터링 조건으로 스터디 목록을 조회합니다")
     public ResponseEntity<ApiResponse<Page<StudyResponse>>> getStudies(
             @Parameter(description = "검색어 (제목/지역)") @RequestParam(required = false) String keyword,
-            @Parameter(description = "시험 종류") @RequestParam(required = false) ExamType examType,
+            @Parameter(description = "시험 종류") @RequestParam(required = false) String examType,
             @Parameter(description = "지역") @RequestParam(required = false) String region,
             @Parameter(description = "최소 목표 점수") @RequestParam(required = false) Integer minScore,
             @Parameter(description = "최대 목표 점수") @RequestParam(required = false) Integer maxScore,
