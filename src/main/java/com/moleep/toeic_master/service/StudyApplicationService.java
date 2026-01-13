@@ -22,6 +22,7 @@ public class StudyApplicationService {
     private final StudyRepository studyRepository;
     private final UserRepository userRepository;
     private final StudyMemberService memberService;
+    private final ScoreService scoreService;
 
     @Transactional
     public ApplicationResponse apply(Long userId, Long studyId, ApplicationRequest request) {
@@ -79,6 +80,9 @@ public class StudyApplicationService {
 
         application.setStatus(ApplicationStatus.ACCEPTED);
         memberService.addMember(application.getStudy(), application.getUser(), MemberRole.MEMBER);
+
+        // 스터디 가입 점수 지급
+        scoreService.addScore(application.getUser().getId(), ScoreType.JOIN_STUDY, application.getStudy().getId());
 
         return ApplicationResponse.from(application);
     }

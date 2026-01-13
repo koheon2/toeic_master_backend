@@ -1,11 +1,14 @@
 package com.moleep.toeic_master.controller;
 
 import com.moleep.toeic_master.dto.request.ProfileUpdateRequest;
+import com.moleep.toeic_master.dto.request.ScoreRequest;
 import com.moleep.toeic_master.dto.response.ApiResponse;
 import com.moleep.toeic_master.dto.response.GalleryImageResponse;
+import com.moleep.toeic_master.dto.response.ScoreResponse;
 import com.moleep.toeic_master.dto.response.StudyResponse;
 import com.moleep.toeic_master.dto.response.UserProfileResponse;
 import com.moleep.toeic_master.security.CustomUserDetails;
+import com.moleep.toeic_master.service.ScoreService;
 import com.moleep.toeic_master.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController {
 
     private final UserService userService;
+    private final ScoreService scoreService;
 
     @GetMapping(value = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "내 프로필 조회", description = "로그인한 사용자의 프로필을 조회합니다")
@@ -89,5 +93,14 @@ public class UserController {
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         java.util.List<StudyResponse> studies = userService.getMyStudies(userDetails.getId());
         return ResponseEntity.ok(ApiResponse.success(studies));
+    }
+
+    @PostMapping(value = "/me/score", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "점수 이벤트 처리", description = "스터디 가입, 리뷰 작성 등의 이벤트에 따른 점수를 지급합니다")
+    public ResponseEntity<ApiResponse<ScoreResponse>> addScore(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Valid @RequestBody ScoreRequest request) {
+        ScoreResponse response = scoreService.addScore(userDetails.getId(), request.getType(), request.getRefId());
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

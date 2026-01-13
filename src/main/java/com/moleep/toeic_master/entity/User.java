@@ -40,6 +40,10 @@ public class User {
     @Column(name = "profile_image_key")
     private String profileImageKey;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer score = 0;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

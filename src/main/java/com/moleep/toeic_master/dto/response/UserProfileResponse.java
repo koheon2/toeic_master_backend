@@ -17,6 +17,7 @@ public class UserProfileResponse {
     private String bio;
     private String tendency;
     private String profileImageUrl;
+    private Integer score;
     private LocalDateTime createdAt;
 
     public static UserProfileResponse from(User user, String profileImageUrl) {
@@ -27,6 +28,7 @@ public class UserProfileResponse {
                 .bio(user.getBio())
                 .tendency(user.getTendency())
                 .profileImageUrl(profileImageUrl)
+                .score(user.getScore())
                 .createdAt(user.getCreatedAt())
                 .build();
     }

@@ -7,6 +7,7 @@ import com.moleep.toeic_master.entity.Review;
 import com.moleep.toeic_master.entity.ReviewImage;
 import com.moleep.toeic_master.entity.ReviewLike;
 import com.moleep.toeic_master.entity.School;
+import com.moleep.toeic_master.entity.ScoreType;
 import com.moleep.toeic_master.entity.User;
 import com.moleep.toeic_master.exception.CustomException;
 import com.moleep.toeic_master.repository.ReviewImageRepository;
@@ -35,6 +36,7 @@ public class ReviewService {
     private final SchoolRepository schoolRepository;
     private final UserRepository userRepository;
     private final S3Service s3Service;
+    private final ScoreService scoreService;
 
     @Transactional(readOnly = true)
     public Page<ReviewResponse> getReviewsBySchool(Long schoolId, Long currentUserId, Pageable pageable) {
@@ -99,6 +101,9 @@ public class ReviewService {
         reviewRepository.save(review);
         school.getReviews().add(review);
         school.updateAvgRating();
+
+        // 리뷰 작성 점수 지급
+        scoreService.addScore(userId, ScoreType.WRITE_REVIEW, review.getId());
 
         return toReviewResponse(review, userId);
     }
