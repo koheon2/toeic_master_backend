@@ -21,6 +21,8 @@ public class StudyService {
     private final StudyRepository studyRepository;
     private final UserRepository userRepository;
     private final StudyMemberRepository studyMemberRepository;
+    private final EmbeddingService embeddingService;
+    private final StudyEmbeddingCache studyEmbeddingCache;
 
     @Transactional(readOnly = true)
     public Page<StudyResponse> getStudies(String keyword, String examType, String region,
@@ -53,7 +55,20 @@ public class StudyService {
                 .meetingFrequency(request.getMeetingFrequency())
                 .build();
 
+        // content 임베딩 생성 및 저장
+        if (request.getContent() != null && !request.getContent().isBlank()) {
+            float[] embedding = embeddingService.getEmbedding(request.getContent());
+            if (embedding != null) {
+                study.setEmbedding(embeddingService.floatArrayToBytes(embedding));
+            }
+        }
+
         studyRepository.save(study);
+
+        // 캐시 업데이트
+        if (study.getEmbedding() != null) {
+            studyEmbeddingCache.put(study.getId(), embeddingService.bytesToFloatArray(study.getEmbedding()));
+        }
 
         // 방장을 멤버로 추가
         StudyMember leader = StudyMember.builder()
@@ -75,6 +90,8 @@ public class StudyService {
             throw new CustomException("수정 권한이 없습니다", HttpStatus.FORBIDDEN);
         }
 
+        boolean contentChanged = request.getContent() != null && !request.getContent().equals(study.getContent());
+
         study.setTitle(request.getTitle());
         study.setContent(request.getContent());
         study.setExamType(request.getExamType());
@@ -83,6 +100,15 @@ public class StudyService {
         study.setMaxMembers(request.getMaxMembers());
         study.setStudyType(request.getStudyType());
         study.setMeetingFrequency(request.getMeetingFrequency());
+
+        // content 변경 시 임베딩 업데이트
+        if (contentChanged && !request.getContent().isBlank()) {
+            float[] embedding = embeddingService.getEmbedding(request.getContent());
+            if (embedding != null) {
+                study.setEmbedding(embeddingService.floatArrayToBytes(embedding));
+                studyEmbeddingCache.put(study.getId(), embedding);
+            }
+        }
 
         return StudyResponse.from(study, studyMemberRepository.countByStudyId(study.getId()));
     }
@@ -97,6 +123,7 @@ public class StudyService {
         }
 
         studyRepository.delete(study);
+        studyEmbeddingCache.remove(studyId);
     }
 
     @Transactional

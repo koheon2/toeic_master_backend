@@ -51,6 +51,9 @@ public class Study {
     @Builder.Default
     private StudyStatus status = StudyStatus.RECRUITING;
 
+    @Column(columnDefinition = "BYTEA")
+    private byte[] embedding;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

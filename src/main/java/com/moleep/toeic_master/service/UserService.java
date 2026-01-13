@@ -27,6 +27,7 @@ public class UserService {
     private final ReviewImageRepository reviewImageRepository;
     private final StudyMemberRepository studyMemberRepository;
     private final S3Service s3Service;
+    private final EmbeddingService embeddingService;
 
     @Transactional(readOnly = true)
     public UserProfileResponse getMyProfile(Long userId) {
@@ -63,7 +64,13 @@ public class UserService {
         }
 
         if (request.getTendency() != null) {
+            boolean tendencyChanged = !request.getTendency().equals(user.getTendency());
             user.setTendency(request.getTendency());
+
+            if (tendencyChanged && StringUtils.hasText(request.getTendency())) {
+                float[] embedding = embeddingService.getEmbedding(request.getTendency());
+                user.setEmbedding(embeddingService.floatArrayToBytes(embedding));
+            }
         }
 
         return UserProfileResponse.from(user, getProfileImageUrl(user));

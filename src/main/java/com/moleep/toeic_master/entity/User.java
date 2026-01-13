@@ -34,6 +34,9 @@ public class User {
     @Column(length = 3000)
     private String tendency;
 
+    @Column(columnDefinition = "BYTEA")
+    private byte[] embedding;
+
     @Column(name = "profile_image_key")
     private String profileImageKey;
 

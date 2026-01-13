@@ -4,7 +4,10 @@ import com.moleep.toeic_master.dto.request.StudyRequest;
 import com.moleep.toeic_master.dto.response.ApiResponse;
 import com.moleep.toeic_master.dto.response.StudyResponse;
 import com.moleep.toeic_master.security.CustomUserDetails;
+import com.moleep.toeic_master.service.StudyRecommendationService;
 import com.moleep.toeic_master.service.StudyService;
+
+import java.util.List;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 public class StudyController {
 
     private final StudyService studyService;
+    private final StudyRecommendationService studyRecommendationService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "스터디 목록 조회", description = "검색 및 필터링 조건으로 스터디 목록을 조회합니다")
@@ -95,5 +99,20 @@ public class StudyController {
 
         StudyResponse study = studyService.closeStudy(userDetails.getId(), id);
         return ResponseEntity.ok(ApiResponse.success("스터디 모집이 마감되었습니다", study));
+    }
+
+    @GetMapping(value = "/recommendations", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "스터디 추천", description = "사용자의 성향을 기반으로 스터디를 추천합니다")
+    public ResponseEntity<ApiResponse<List<StudyResponse>>> getRecommendations(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Parameter(description = "시험 종류") @RequestParam(required = false) String examType,
+            @Parameter(description = "지역") @RequestParam(required = false) String region,
+            @Parameter(description = "최소 목표 점수") @RequestParam(required = false) Integer minScore,
+            @Parameter(description = "최대 목표 점수") @RequestParam(required = false) Integer maxScore,
+            @Parameter(description = "추천 개수") @RequestParam(defaultValue = "10") int topK) {
+
+        List<StudyResponse> recommendations = studyRecommendationService.getRecommendedStudies(
+                userDetails.getId(), examType, region, minScore, maxScore, topK);
+        return ResponseEntity.ok(ApiResponse.success(recommendations));
     }
 }
