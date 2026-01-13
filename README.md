@@ -17,46 +17,64 @@
 ## 시스템 아키텍처
 
 ```
-        Frontend                        Backend                              DB / Storage
-  ┌──────────────────┐          ┌──────────────────────┐          ┌─────────────────────────┐
-  │                  │          │      AWS EC2         │          │                         │
-  │  ┌────────────┐  │          │  ┌────────────────┐  │          │  ┌─────────────────┐    │
-  │  │  Flutter   │  │  REST    │  │  Spring Boot   │  │  SQL     │  │    AWS RDS      │    │
-  │  │  Mobile    │──┼──────────┼─▶│  API Server    │──┼──────────┼─▶│  (PostgreSQL)   │    │
-  │  │   App      │  │  API     │  │                │  │          │  │                 │    │
-  │  │            │  │          │  │  Auth(JWT)     │  │          │  │  users          │    │
-  │  │ ─────────  │  │          │  │  User, Study   │  │          │  │  studies        │    │
-  │  │ Study      │  │◀─────────┼──│  School, Chat  │◀─┼──────────┼──│  schools        │    │
-  │  │ School Map │  │  JSON    │  │  Review        │  │  Data    │  │  reviews        │    │
-  │  │ Review     │  │ Response │  └────────────────┘  │          │  │  chat_messages  │    │
-  │  │ Chat UI    │  │          │          │           │          │  └─────────────────┘    │
-  │  └────────────┘  │          │          │           │          │                         │
-  │        │         │          │          │ Embedding │          │  ┌─────────────────┐    │
-  │        │         │          │          ▼ Request   │          │  │                 │    │
-  │        │         │          │  ┌────────────────┐  │          │  │    AWS S3       │    │
-  │        │         │          │  │  KCLOUD        │  │  Image   │  │                 │    │
-  │        │         │          │  │  AI Server     │  │  Upload  │  │  Profile Imgs   │    │
-  │        │         │          │  │                │  ├──────────┼─▶│  Review Imgs    │    │
-  │        │         │          │  │  /embed        │  │          │  │  Chat Imgs      │    │
-  │        │         │          │  │  /venue/eval   │  │          │  │                 │    │
-  │        │         │          │  └────────────────┘  │          │  └────────┬────────┘    │
-  │        │         │          │                      │          │           │             │
-  └────────┼─────────┘          └──────────────────────┘          └───────────┼─────────────┘
-           │                                                                  │
-           │                        Presigned URL                             │
-           └──────────────────────────────────────────────────────────────────┘
-                                   (Direct Access)
+      Frontend                         Backend                               DB / Storage
+ ┌──────────────────┐          ┌────────────────────────┐          ┌──────────────────────────┐
+ │                  │          │       AWS EC2          │          │                          │
+ │  ┌────────────┐  │          │  ┌──────────────────┐  │          │  ┌────────────────────┐  │
+ │  │  Flutter   │  │  REST    │  │   Spring Boot    │  │   SQL    │  │     AWS RDS        │  │
+ │  │  Mobile    │──┼──────────┼─▶│   API Server     │──┼──────────┼─▶│   (PostgreSQL)     │  │
+ │  │   App      │  │  API     │  │                  │  │          │  │                    │  │
+ │  │            │  │          │  │  Auth (JWT)      │  │          │  │  users, studies    │  │
+ │  │ ─────────  │  │          │  │  User, Study     │  │          │  │  schools, reviews  │  │
+ │  │ Study      │  │◀─────────┼──│  School, Review  │◀─┼──────────┼──│  chat_messages     │  │
+ │  │ School Map │  │  JSON    │  │  Chat (WebSocket)│  │  Data    │  │                    │  │
+ │  │ Review     │  │ Response │  └──────────────────┘  │          │  └────────────────────┘  │
+ │  │ Chat UI    │  │          │           │            │          │                          │
+ │  └────────────┘  │          │           │ HTTP       │          │  ┌────────────────────┐  │
+ │        │         │          │           ▼            │          │  │                    │  │
+ │        │         │          │  ┌──────────────────┐  │  Image   │  │      AWS S3        │  │
+ │        │         │          │  │   KCLOUD GPU     │  │  Upload  │  │                    │  │
+ │        │         │          │  │   AI Server      │  ├──────────┼─▶│  Profile Images    │  │
+ │        │         │          │  │   (FastAPI)      │  │          │  │  Review Images     │  │
+ │        │         │          │  │                  │  │          │  │  Chat Images       │  │
+ │        │         │          │  │ ┌──────────────┐ │  │          │  │                    │  │
+ │        │         │          │  │ │   LLaMA 3.1  │ │  │          │  └─────────┬──────────┘  │
+ │        │         │          │  │ │     8B       │ │  │          │            │             │
+ │        │         │          │  │ └──────────────┘ │  │          │            │             │
+ │        │         │          │  │ ┌──────────────┐ │  │          │            │             │
+ │        │         │          │  │ │ Sentence     │ │  │          │            │             │
+ │        │         │          │  │ │ Transformer  │ │  │          │            │             │
+ │        │         │          │  │ │(e5-base)     │ │  │          │            │             │
+ │        │         │          │  │ └──────────────┘ │  │          │            │             │
+ │        │         │          │  └──────────────────┘  │          │            │             │
+ └────────┼─────────┘          └────────────────────────┘          └────────────┼─────────────┘
+          │                                                                     │
+          │                         Presigned URL                               │
+          └─────────────────────────────────────────────────────────────────────┘
+                                    (Direct Access)
 ```
 
 ### 컴포넌트 설명
 
-| 컴포넌트 | 기술 | 역할 |
-|---------|------|------|
-| **Flutter App** | Flutter | 사용자 인터페이스 (스터디, 지도, 리뷰, 채팅) |
-| **Spring Boot** | Java 21, Spring Boot 4.0 | REST API, WebSocket, 비즈니스 로직 |
-| **KCLOUD AI** | Python, Embedding Model | 텍스트 임베딩 생성, 리뷰 평가 생성 |
-| **AWS RDS** | PostgreSQL | 사용자, 스터디, 학교, 리뷰 데이터 저장 |
+| 컴포넌트 | 기술 스택 | 역할 |
+|---------|----------|------|
+| **Flutter App** | Flutter, Dart | 사용자 인터페이스 (스터디, 지도, 리뷰, 채팅) |
+| **Spring Boot** | Java 21, Spring Boot 4.0 | REST API, WebSocket, JWT 인증, 비즈니스 로직 |
+| **KCLOUD AI Server** | FastAPI, PyTorch, CUDA | 텍스트 임베딩 생성, LLM 기반 리뷰 평가 생성 |
+| **AWS RDS** | PostgreSQL 17 | 사용자, 스터디, 학교, 리뷰, 채팅 데이터 저장 |
 | **AWS S3** | S3 | 이미지 파일 저장, Presigned URL 발급 |
+
+### AI Server 상세
+
+| 모델 | 용도 |
+|-----|------|
+| **LLaMA 3.1 8B Instruct** | 리뷰 기반 고사장 평가 문장 생성 |
+| **multilingual-e5-base** | 텍스트 → 768차원 임베딩 벡터 변환 |
+
+| 엔드포인트 | 입력 | 출력 |
+|-----------|------|------|
+| `POST /embed` | `{ text: string }` | `{ embedding: float[] }` |
+| `POST /venue/eval-embed` | `{ reviews: string[] }` | `{ evaluation: string, embedding: float[] }` |
 
 ### 데이터 흐름
 

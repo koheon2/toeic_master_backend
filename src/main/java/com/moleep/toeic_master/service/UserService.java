@@ -134,4 +134,12 @@ public class UserService {
                 .map(member -> StudyResponse.from(member.getStudy(), studyMemberRepository.countByStudyId(member.getStudy().getId())))
                 .toList();
     }
+
+    @Transactional
+    public UserProfileResponse addTestScore(Long userId, int amount) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException("사용자를 찾을 수 없습니다", HttpStatus.NOT_FOUND));
+        user.setScore(user.getScore() + amount);
+        return UserProfileResponse.from(user, getProfileImageUrl(user));
+    }
 }

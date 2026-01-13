@@ -103,4 +103,12 @@ public class UserController {
         ScoreResponse response = scoreService.addScore(userDetails.getId(), request.getType(), request.getRefId());
         return ResponseEntity.ok(ApiResponse.success(response));
     }
+
+    @PostMapping(value = "/me/score/test", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "[테스트용] 점수 50점 추가", description = "레벨 UI 테스트를 위해 점수를 50점 추가합니다")
+    public ResponseEntity<ApiResponse<UserProfileResponse>> addTestScore(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        UserProfileResponse profile = userService.addTestScore(userDetails.getId(), 50);
+        return ResponseEntity.ok(ApiResponse.success("테스트 점수 50점이 추가되었습니다", profile));
+    }
 }
