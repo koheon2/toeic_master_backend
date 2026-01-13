@@ -13,4 +13,7 @@ public class ProfileUpdateRequest {
 
     @Size(max = 500, message = "자기소개는 500자 이하여야 합니다")
     private String bio;
+
+    @Size(max = 3000, message = "성향은 3000자 이하여야 합니다")
+    private String tendency;
 }

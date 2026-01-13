@@ -62,6 +62,10 @@ public class UserService {
             user.setBio(request.getBio());
         }
 
+        if (request.getTendency() != null) {
+            user.setTendency(request.getTendency());
+        }
+
         return UserProfileResponse.from(user, getProfileImageUrl(user));
     }
 

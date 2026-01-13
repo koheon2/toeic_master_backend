@@ -31,6 +31,9 @@ public class User {
     @Column(columnDefinition = "TEXT")
     private String bio;
 
+    @Column(length = 3000)
+    private String tendency;
+
     @Column(name = "profile_image_key")
     private String profileImageKey;
 

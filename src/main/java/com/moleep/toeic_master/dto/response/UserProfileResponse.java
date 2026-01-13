@@ -15,6 +15,7 @@ public class UserProfileResponse {
     private String email;
     private String nickname;
     private String bio;
+    private String tendency;
     private String profileImageUrl;
     private LocalDateTime createdAt;
 
@@ -24,6 +25,7 @@ public class UserProfileResponse {
                 .email(user.getEmail())
                 .nickname(user.getNickname())
                 .bio(user.getBio())
+                .tendency(user.getTendency())
                 .profileImageUrl(profileImageUrl)
                 .createdAt(user.getCreatedAt())
                 .build();
