@@ -111,6 +111,50 @@ public class DataLoader implements CommandLineRunner {
                         .address("대전광역시 중구 동서대로1352번길 33")
                         .latitude(new BigDecimal("36.33007650"))
                         .longitude(new BigDecimal("127.41101070"))
+                        .build(),
+
+                //여기까지 토익
+
+                School.builder()
+                        .name("충남대학교국제언어교육센터")
+                        .address("대전광역시 유성구 궁동 대학로 99")
+                        .latitude(new BigDecimal("36.3688066"))
+                        .longitude(new BigDecimal("127.3467804"))
+                        .build(),
+
+                School.builder()
+                        .name("대덕대학교")
+                        .address("대전광역시 유성구 장동로 48")
+                        .latitude(new BigDecimal("36.3907123"))
+                        .longitude(new BigDecimal("127.3654646"))
+                        .build(),
+
+                School.builder()
+                        .name("카이스트")
+                        .address("대전광역시 유성구 대학로 291")
+                        .latitude(new BigDecimal("36.3721427"))
+                        .longitude(new BigDecimal("127.36039"))
+                        .build(),
+
+                School.builder()
+                        .name("둔산SDA")
+                        .address("대전광역시 서구 한밭대로707번길 31")
+                        .latitude(new BigDecimal("36.35921"))
+                        .longitude(new BigDecimal("127.377204"))
+                        .build(),
+
+                School.builder()
+                        .name("그라운드 에듀")
+                        .address("대전광역시 서구 둔산로 69 금성빌딩 7층 704호")
+                        .latitude(new BigDecimal("36.334444"))
+                        .longitude(new BigDecimal("127.3365627"))
+                        .build(),
+
+                School.builder()
+                        .name("대흥 리더스교육평가원")
+                        .address("대전광역시 중구 대종로 417-1 (대흥동) 2층")
+                        .latitude(new BigDecimal("36.3222244"))
+                        .longitude(new BigDecimal("127.42934"))
                         .build()
         );
 
