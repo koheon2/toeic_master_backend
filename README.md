@@ -2,6 +2,9 @@
 
 토익 시험 준비를 위한 스터디 매칭 및 고사장 리뷰 플랫폼 백엔드 API 서버
 
+# Ai server github
+https://github.com/koheon2/examtalk_ai.git
+
 ## 기술 스택
 
 - **Framework**: Spring Boot 4.0.1
