@@ -5,6 +5,9 @@
 # Ai server github
 https://github.com/koheon2/examtalk_ai.git
 
+# frontend github
+https://github.com/kang022878/examtalk_front.git
+
 ## 기술 스택
 
 - **Framework**: Spring Boot 4.0.1
