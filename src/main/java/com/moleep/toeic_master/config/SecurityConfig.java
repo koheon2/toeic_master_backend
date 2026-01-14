@@ -30,6 +30,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/test/**").permitAll()
                         .requestMatchers("/swagger-ui/**","/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html").permitAll()
                         // WebSocket
                         .requestMatchers("/ws/**").permitAll()

@@ -17,6 +17,7 @@ public class SchoolResponse {
     private BigDecimal longitude;
     private BigDecimal avgRating;
     private int reviewCount;
+    private String evaluation;
 
     public static SchoolResponse from(School school) {
         return SchoolResponse.builder()
@@ -27,6 +28,7 @@ public class SchoolResponse {
                 .longitude(school.getLongitude())
                 .avgRating(school.getAvgRating())
                 .reviewCount(school.getReviews().size())
+                .evaluation(school.getEvaluation())
                 .build();
     }
 }
