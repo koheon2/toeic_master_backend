@@ -2,6 +2,11 @@ spring:
   application:
     name: toeic_master
 
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 100MB
+
   datasource:
     url: jdbc:postgresql://toeic-master-db.cnio2wekq32n.ap-northeast-2.rds.amazonaws.com:5432/toeic_master
     username: toeic_master
