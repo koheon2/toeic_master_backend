@@ -124,8 +124,9 @@ public class StudyService {
             throw new CustomException("삭제 권한이 없습니다", HttpStatus.FORBIDDEN);
         }
 
-        // 관련 채팅 메시지 먼저 삭제
+        // 관련 데이터 먼저 삭제
         chatMessageRepository.deleteByStudyId(studyId);
+        studyMemberRepository.deleteByStudyId(studyId);
 
         studyRepository.delete(study);
         studyEmbeddingCache.remove(studyId);
