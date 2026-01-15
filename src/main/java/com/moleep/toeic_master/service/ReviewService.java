@@ -150,6 +150,9 @@ public class ReviewService {
             s3Service.delete(image.getImageKey());
         }
 
+        // 관련 좋아요 먼저 삭제
+        reviewLikeRepository.deleteByReviewId(reviewId);
+
         School school = review.getSchool();
         Long schoolId = school.getId();
         school.getReviews().remove(review);

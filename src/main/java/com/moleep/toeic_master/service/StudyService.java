@@ -3,6 +3,7 @@ package com.moleep.toeic_master.service;
 import com.moleep.toeic_master.dto.request.StudyRequest;
 import com.moleep.toeic_master.dto.response.StudyResponse;
 import com.moleep.toeic_master.entity.*;
+import com.moleep.toeic_master.repository.ChatMessageRepository;
 import com.moleep.toeic_master.repository.StudyMemberRepository;
 import com.moleep.toeic_master.exception.CustomException;
 import com.moleep.toeic_master.repository.StudyRepository;
@@ -21,6 +22,7 @@ public class StudyService {
     private final StudyRepository studyRepository;
     private final UserRepository userRepository;
     private final StudyMemberRepository studyMemberRepository;
+    private final ChatMessageRepository chatMessageRepository;
     private final EmbeddingService embeddingService;
     private final StudyEmbeddingCache studyEmbeddingCache;
 
@@ -121,6 +123,9 @@ public class StudyService {
         if (!study.getUser().getId().equals(userId)) {
             throw new CustomException("삭제 권한이 없습니다", HttpStatus.FORBIDDEN);
         }
+
+        // 관련 채팅 메시지 먼저 삭제
+        chatMessageRepository.deleteByStudyId(studyId);
 
         studyRepository.delete(study);
         studyEmbeddingCache.remove(studyId);

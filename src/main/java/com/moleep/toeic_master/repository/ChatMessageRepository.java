@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
     Page<ChatMessage> findByStudyIdOrderByCreatedAtDesc(Long studyId, Pageable pageable);
+    void deleteByStudyId(Long studyId);
 }
